@@ -14,13 +14,14 @@ module.exports = function startupScripts (params, callback) {
 
   if (startupCommands && runStartupCommands) {
     let now = Date.now()
-    let ARC_INV = JSON.stringify(inventory.inv)
+    // TODO: find better way to pass big inventory to process.exec() > 150KB (E2BIG Error https://github.com/architect/architect/issues/1355)
+    // let ARC_INV = JSON.stringify(inventory.inv)
     let ARC_RAW = JSON.stringify(inventory.inv._project.arc)
     let envVars = userEnvVars(params)
     update.status('Running startup scripts')
     let ops = startupCommands.map(cmd => {
       return function (callback) {
-        let env = { ...process.env, ARC_INV, ARC_RAW, ...envVars }
+        let env = { ...process.env, /*ARC_INV,*/ ARC_RAW, ...envVars }
         exec(cmd, { cwd, env }, function (err, stdout, stderr) {
           if (err) callback(err)
           else {
