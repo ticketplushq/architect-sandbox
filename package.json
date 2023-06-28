@@ -1,6 +1,6 @@
 {
   "name": "@ticketplushq/architect-sandbox",
-  "version": "5.7.1",
+  "version": "5.7.1a",
   "description": "Architect dev server: run full Architect projects locally & offline",
   "main": "src/index.js",
   "scripts": {
