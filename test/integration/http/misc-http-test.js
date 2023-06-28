@@ -31,7 +31,7 @@ function runTests (runType, t) {
         t.equal(err.statusCode, 403, 'Errors with 403')
         t.match(err.body, new RegExp(message), `Errors with message instructing to add '${message}' handler`)
       }
-      else t.fail(result)
+      else t.end(result)
     })
   })
 
@@ -41,7 +41,7 @@ function runTests (runType, t) {
     tiny.get({
       url: url + path
     }, function _got (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let { message, pathParameters, rawPath } = result.body
         t.equal(rawPath, path, `got ${rawPath}`)
@@ -57,7 +57,7 @@ function runTests (runType, t) {
     tiny.get({
       url: url + path
     }, function _got (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let { message, pathParameters, rawPath } = result.body
         t.equal(rawPath, path, `got ${rawPath}`)
@@ -73,7 +73,7 @@ function runTests (runType, t) {
     tiny.get({
       url: url + path
     }, function _got (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let { message, pathParameters, rawPath } = result.body
         t.equal(rawPath, path, `got ${rawPath}`)
@@ -89,7 +89,7 @@ function runTests (runType, t) {
     tiny.get({
       url: url + path
     }, function _got (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let { message, pathParameters, rawPath } = result.body
         t.equal(rawPath, path, `got ${rawPath}`)
@@ -106,13 +106,69 @@ function runTests (runType, t) {
       url: url + '/times-out'
     }, function _got (err, result) {
       if (err) {
-        let message = 'Timeout Error'
+        let message = 'Timeout error'
         let time = '1 second'
         t.equal(err.statusCode, 500, 'Errors with 500')
         t.match(err.body, new RegExp(message), `Errors with message: '${message}'`)
         t.match(err.body, new RegExp(time), `Timed out set to ${time}`)
       }
-      else t.fail(result)
+      else t.end(result)
+    })
+  })
+
+  t.test(`[context.getRemainingTimeInMillis() / ${runType}] get /context-remaining-ms-node-cjs`, t => {
+    t.plan(1)
+    tiny.get({
+      url: url + '/context-remaining-ms-node-cjs'
+    }, function _got (err, result) {
+      if (err) t.end(err)
+      else {
+        let { remaining } = result.body
+        // Would you believe that Windows, being Windows, actually sometimes calculates >5s remaining on a 5s timeout? You can't make this stuff up.
+        t.ok(remaining > 0 && remaining <= 6000, `Got remaining time in milliseconds from context method: ${remaining}`)
+      }
+    })
+  })
+
+  t.test(`[context.getRemainingTimeInMillis() / ${runType}] get /context-remaining-ms-node-esm`, t => {
+    t.plan(1)
+    tiny.get({
+      url: url + '/context-remaining-ms-node-esm'
+    }, function _got (err, result) {
+      if (err) t.end(err)
+      else {
+        let { remaining } = result.body
+        // Would you believe that Windows, being Windows, actually sometimes calculates >5s remaining on a 5s timeout? You can't make this stuff up.
+        t.ok(remaining > 0 && remaining <= 6000, `Got remaining time in milliseconds from context method: ${remaining}`)
+      }
+    })
+  })
+
+  t.test(`[Big, but not oversized response / ${runType}] get /big`, t => {
+    t.plan(1)
+    tiny.get({
+      url: url + '/big'
+    }, function _got (err, result) {
+      if (err) t.end(err)
+      else {
+        let validSize = (1000 * 999 * 6) + 1
+        let body = '.'.repeat(validSize)
+        t.equal(body, result.body, 'Did not fail on a very large request')
+      }
+    })
+  })
+
+  t.test(`[Big, but not oversized response / ${runType}] get /big-unicode`, t => {
+    t.plan(1)
+    tiny.get({
+      url: url + '/big-unicode'
+    }, function _got (err, result) {
+      if (err) t.end(err)
+      else {
+        // Sizes are a bit less predictable when generating random unicode, so we'll be a bit conservative with the estimations and see if anything breaks
+        let big = 1000 * 750 * 6
+        t.ok(Buffer.byteLength(JSON.stringify(result.body)) > big, 'Did not fail on a very large response')
+      }
     })
   })
 
@@ -126,7 +182,37 @@ function runTests (runType, t) {
         t.equal(err.statusCode, 502, 'Errors with 502')
         t.match(err.body, new RegExp(message), `Errors with message: '${message}'`)
       }
-      else t.fail(result)
+      else t.end(result)
+    })
+  })
+
+  t.test(`[Big, but not oversized request / ${runType}] post /big`, t => {
+    t.plan(1)
+    let validSize = (1000 * 999 * 6) + 1
+    let body = { text: '.'.repeat(validSize) }
+    tiny.post({
+      url: url + '/big',
+      body
+    }, function _got (err, result) {
+      if (err) t.end(err)
+      else t.deepEqual(body, result.body, 'Did not fail on a very large request')
+    })
+  })
+
+  t.test(`[Oversized request / ${runType}] post /big`, t => {
+    t.plan(2)
+    let validSize = (1000 * 1000 * 6) + 1
+    let body = { text: '.'.repeat(validSize) }
+    tiny.post({
+      url: url + '/big',
+      body
+    }, function _got (err, result) {
+      if (err) {
+        let message = 'Maximum event body exceeded'
+        t.equal(err.statusCode, 502, 'Errors with 502')
+        t.match(err.body, new RegExp(message), `Errors with message: '${message}'`)
+      }
+      else t.end(result)
     })
   })
 

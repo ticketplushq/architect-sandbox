@@ -1,4 +1,4 @@
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   const body = event
   body.message = 'Hello from a multi-tenant Lambda!'
   body.context = context

@@ -17,7 +17,7 @@ let startup = {
       quiet: print !== undefined ? false : quiet,
       ...options,
     }, (err, result) => {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(result, 'Sandbox successfully started', 'Sandbox started (module)')
         if (callback) callback()
@@ -64,7 +64,7 @@ let shutdown = {
     let { planAdd = 0 } = options
     t.plan(1 + planAdd)
     sandbox.end((err, result) => {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       if (result !== 'Sandbox successfully shut down') {
         t.fail('Did not get back Sandbox shutdown message')
       }
@@ -121,7 +121,7 @@ let verifyShutdown = (t, type, callback) => {
       t.ok(errs.includes(err.code), `Sandbox successfully shut down (${type})`)
       if (callback) callback()
     }
-    else t.fail('Sandbox did not shut down')
+    else t.end('Sandbox did not shut down')
   })
 }
 verifyShutdown.async = (...params) => new Promise((resolve, reject) => {

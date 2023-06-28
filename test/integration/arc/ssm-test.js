@@ -1,3 +1,4 @@
+require('aws-sdk/lib/maintenance_mode_message').suppress = true
 let { join } = require('path')
 let test = require('tape')
 let aws = require('aws-sdk')
@@ -53,7 +54,7 @@ function runTests (runType, t) {
     t.plan(6)
     // Should get all tables params back
     ssm.getParametersByPath({ Path: `/${app}` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(result.Parameters.length, 5, 'Got back correct number of params')
         check({ result, type: 'tables', items: tables, t })
@@ -65,7 +66,7 @@ function runTests (runType, t) {
     t.plan(6)
     // Should get all tables params back
     ssm.getParametersByPath({ Path: `/ArcAppTesting` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(result.Parameters.length, 5, 'Got back correct number of params')
         check({ result, type: 'tables', items: tables, fallback: true, t })
@@ -76,7 +77,7 @@ function runTests (runType, t) {
   t.test(`${mode} Get & check params (specifying a type)`, t => {
     t.plan(6)
     ssm.getParametersByPath({ Path: `/${app}/tables` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(result.Parameters.length, 4, 'Got back correct number of params')
         check({ result, type: 'tables', items: tables, t })
@@ -87,7 +88,7 @@ function runTests (runType, t) {
   t.test(`${mode} Get & check params (specifying a type; Arc Functions bare module mode)`, t => {
     t.plan(6)
     ssm.getParametersByPath({ Path: `/ArcAppTesting/tables` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(result.Parameters.length, 4, 'Got back correct number of params')
         check({ result, type: 'tables', items: tables, fallback: true, t })
@@ -98,7 +99,7 @@ function runTests (runType, t) {
   t.test(`${mode} Get & check params (specifying an invalid or unknown service)`, t => {
     t.plan(1)
     ssm.getParametersByPath({ Path: `/${app}/idk` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else t.deepEqual(result.Parameters, [], 'No parameters returned')
     })
   })
@@ -106,7 +107,7 @@ function runTests (runType, t) {
   t.test(`${mode} Get & check params (specifying an invalid or unknown service; Arc Functions bare module mode)`, t => {
     t.plan(1)
     ssm.getParametersByPath({ Path: `/ArcAppTesting/idk` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else t.deepEqual(result.Parameters, [], 'No parameters returned')
     })
   })
@@ -114,7 +115,7 @@ function runTests (runType, t) {
   t.test(`${mode} Get & check params (specifying an invalid or unknown app)`, t => {
     t.plan(1)
     ssm.getParametersByPath({ Path: `/idk` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else t.deepEqual(result.Parameters, [], 'No parameters returned')
     })
   })
@@ -122,7 +123,7 @@ function runTests (runType, t) {
   t.test(`${mode} Get & check params (specifying an unknown app + known service)`, t => {
     t.plan(1)
     ssm.getParametersByPath({ Path: `/idk/tables` }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else t.deepEqual(result.Parameters, [], 'No parameters returned')
     })
   })
@@ -134,13 +135,13 @@ function runTests (runType, t) {
     t.plan(1)
     let key = `/${app}/tables/accounts`
     ssm.getParameter({ Name: key }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let { Name, Value } = result.Parameter
         if (Name === key && Value === `mockapp-staging-accounts`) {
           t.pass(`Found param: ${key}`)
         }
-        else t.fail(`Could not find param: ${key}`)
+        else t.end(`Could not find param: ${key}`)
       }
     })
   })
@@ -149,13 +150,13 @@ function runTests (runType, t) {
     t.plan(1)
     let key = `/ArcAppTesting/tables/accounts`
     ssm.getParameter({ Name: key }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let { Name, Value } = result.Parameter
         if (Name === key && Value === `mockapp-staging-accounts`) {
           t.pass(`Found param: ${key}`)
         }
-        else t.fail(`Could not find param: ${key}`)
+        else t.end(`Could not find param: ${key}`)
       }
     })
   })
@@ -222,7 +223,7 @@ function runTests (runType, t) {
     t.plan(5)
     // Should get all tables params back
     ssm.getParametersByPath({ Path: '/PluginsSandboxTesting' }, function (err, result) {
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(result.Parameters.length, 2, 'One parameter returned')
         t.equal(result.Parameters[0].Name, '/PluginsSandboxTesting/ARC_SANDBOX/ports', 'Plugin parameter name correct')

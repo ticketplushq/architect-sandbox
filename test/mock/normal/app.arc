@@ -16,6 +16,7 @@ get     / # runs default
 # Runtimes
 get     /nodejs18.x
 get     /nodejs14.x
+get     /node-esm
 get     /python3.8
 get     /python3.7
 get     /ruby2.7
@@ -32,10 +33,17 @@ get     /promise-return
 get     /reject-promise
 get     /throw-sync-error
 get     /times-out
+get     /context-remaining-ms-node-cjs
+get     /context-remaining-ms-node-esm
+get     /python-error
+get     /ruby-error
 /custom
   method get
   src src/http/custom
+get     /big
+get     /big-unicode
 get     /chonky
+post    /big
 post    /post
 put     /put
 patch   /patch

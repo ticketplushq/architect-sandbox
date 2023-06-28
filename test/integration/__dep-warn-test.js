@@ -33,6 +33,7 @@ function reset () {
 /**
  * Hello! Because this test deals in node module loading it must be run before all other tests.
  */
+
 test('Set up env', t => {
   t.plan(1)
   t.ok(sandbox, 'Got Sandbox')
@@ -64,7 +65,7 @@ function runTests (runType, t ) {
       url: url + '/deps-in-lambda'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'basic', 'src', 'http', 'get-deps_in_lambda'))
         t.match(data, new RegExp(`Please run: cd ${dir}`), 'Got a dep warning on the correct Lambda (with instructions to install into the Lambda)')
@@ -84,7 +85,7 @@ function runTests (runType, t ) {
       url: url + '/deps-in-root'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'basic', 'src', 'http', 'get-deps_in_root'))
         t.doesNotMatch(data, new RegExp(dir), 'Got a dep warning for root (with instructions to install into root)')
@@ -104,7 +105,7 @@ function runTests (runType, t ) {
       url: url + '/deps-in-shared'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'basic', 'src', 'http', 'get-deps_in_shared'))
         t.doesNotMatch(data, new RegExp(dir), 'Got a dep warning for shared (with instructions to install into root)')
@@ -124,7 +125,7 @@ function runTests (runType, t ) {
       url: url + '/deps-found'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.equal(data, '', 'No warnings issued when all deps are found uniformly')
         reset()
@@ -141,7 +142,7 @@ function runTests (runType, t ) {
         t.ok(err, 'Got a failure')
         t.match(err.body, /Cannot find module 'foo'/, 'Could not find dependency (`foo`)')
       }
-      else t.fail('Expected an error')
+      else t.end('Expected an error')
     })
   })
 
@@ -161,7 +162,7 @@ function runTests (runType, t ) {
       url: url + '/shared'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.doesNotMatch(data, /root-dep/, 'Did not get any dep warnings')
         reset()
@@ -176,7 +177,7 @@ function runTests (runType, t ) {
       url: url + '/views'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         t.doesNotMatch(data, /root-dep/, 'Did not get any dep warnings')
         reset()
@@ -200,7 +201,7 @@ function runTests (runType, t ) {
       url: url + '/shared'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'shared-packages', 'src', 'shared'))
         t.match(data, new RegExp(`Please run: cd ${dir}`), 'Got a dep warning on the correct Lambda (with instructions to install deps into src/shared)')
@@ -220,7 +221,7 @@ function runTests (runType, t ) {
       url: url + '/views'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'shared-packages', 'src', 'views'))
         t.match(data, new RegExp(`Please run: cd ${dir}`), 'Got a dep warning on the correct Lambda (with instructions to install deps into src/views)')
@@ -249,7 +250,7 @@ function runTests (runType, t ) {
       url: url + '/shared'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'lambda-packages', 'src', 'http', 'get-shared'))
         t.match(data, new RegExp(`Please run: cd ${dir}`), 'Got a dep warning on the correct Lambda (with instructions to install into the Lambda)')
@@ -269,7 +270,7 @@ function runTests (runType, t ) {
       url: url + '/views'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let dir = escSlashes(join(tmp, 'lambda-packages', 'src', 'http', 'get-views'))
         t.match(data, new RegExp(`Please run: cd ${dir}`), 'Got a dep warning on the correct Lambda (with instructions to install into the Lambda)')
@@ -298,7 +299,7 @@ function runTests (runType, t ) {
       url: url + '/shared'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let lambdaDir = escSlashes(join(tmp, 'all-packages', 'src', 'http', 'get-shared'))
         let sharedDir = escSlashes(join(tmp, 'all-packages', 'src', 'shared'))
@@ -320,7 +321,7 @@ function runTests (runType, t ) {
       url: url + '/views'
     }, function _got (err) {
       teardown()
-      if (err) t.fail(err)
+      if (err) t.end(err)
       else {
         let lambdaDir = escSlashes(join(tmp, 'all-packages', 'src', 'http', 'get-views'))
         let viewsDir = escSlashes(join(tmp, 'all-packages', 'src', 'views'))

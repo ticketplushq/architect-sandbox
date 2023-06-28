@@ -50,8 +50,15 @@ module.exports = function requestFormatter ({ method, path, req }) {
     request.queryStringParameters = queryStringParameters
   }
 
+  // Client IP address
+  let ip =  req.headers?.['x-forwarded-for'] ||
+            req.socket?.remoteAddress ||
+            req.connection?.remoteAddress ||
+            req.connection?.socket?.remoteAddress
+  let sourceIp = ip?.split(':').slice(-1).join() || null // Handle IPV6 prepended formatting
+
   // Headers + cookies
-  let { headers, cookies } = headerFormatter(req.headers)
+  let { headers, cookies } = headerFormatter(req.headers, { req, ip: sourceIp })
   if (cookies) request.cookies = cookies
   request.headers = headers
 
@@ -59,9 +66,14 @@ module.exports = function requestFormatter ({ method, path, req }) {
   request.requestContext = {
     http: {
       method: req.method || method.toUpperCase(),
-      path: pathname
+      path: pathname,
+      protocol: `HTTP/${req.httpVersion}`,
+      sourceIp,
+      userAgent: headers['user-agent'] || null,
     },
-    routeKey
+    // requestId // TODO add me maybe
+    routeKey,
+    timeEpoch: Math.floor(Date.now() / 1000)
   }
 
   // Path parameters

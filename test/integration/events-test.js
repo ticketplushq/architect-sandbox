@@ -53,11 +53,11 @@ function verifyPublish ({ t, pragma, event, file, message }) {
     name: event,
     payload: { filename: file, message },
   }, function done (err) {
-    if (err) t.fail(err)
+    if (err) t.end(err)
     else {
       t.pass('Successfully published event')
       timer = setTimeout(() => {
-        t.fail(`Did not write file in ${ohno}ms, sigh`)
+        t.end(`Did not write file in ${ohno}ms, sigh`)
       }, ohno)
     }
   })
@@ -119,7 +119,7 @@ function runTests (runType, t) {
         t.match(err.message, /404/, 'Event not found')
         teardown(t)
       }
-      else t.fail('Publish should have failed')
+      else t.end('Publish should have failed')
     })
   })
 
@@ -178,7 +178,7 @@ function runTests (runType, t) {
         t.match(err.message, /404/, 'Event not found')
         teardown(t)
       }
-      else t.fail('Publish should have failed')
+      else t.end('Publish should have failed')
     })
   })
 
